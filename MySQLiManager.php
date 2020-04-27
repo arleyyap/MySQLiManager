@@ -5,12 +5,12 @@ class MySQLiManager
 
 	private $link;
 
-	public function __construct($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME)
+	public function __construct()
 	{
-		$this->DB_HOST = $DB_HOST;
-		$this->DB_USER = $DB_USER;
-		$this->DB_PASS = $DB_PASS;
-		$this->DB_NAME = $DB_NAME;
+		$DB_HOST = 'localhost';
+		$DB_USER = 'root';
+		$DB_PASS = 'root';
+		$DB_NAME = 'mmorpg';
 		$this->link = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
 
 		if (mysqli_connect_errno()) {
@@ -50,8 +50,10 @@ class MySQLiManager
 	 */
 	function select($attr, $table, $where = '')
 	{
+
 		$where = ($where != '' ||  $where != null) ? "WHERE " . $where : '';
 		$stmt = "SELECT " . $attr . " FROM `" . $table . "` " . $where . ";";
+        //print_r($stmt);
 		$result = $this->link->query($stmt) or die($this->link->error . __LINE__);
 
 		if ($result->num_rows > 0) {
@@ -84,18 +86,18 @@ class MySQLiManager
 		$columnas = null;
 		$valores = null;
 
-		foreach ($values as $key => $value) {
-			$columnas .= $key . ',';
-			if ($sanear == true) {
-				$valores .= '"' . ucwords(strtolower($value)) . '",';
-			} else {
-				$valores .= '"' . $value . '",';
-			}
-		}
+        foreach ($values as $key => $value) {
+            $columnas.=$key.',';
+            if( $sanear == true){
+                $valores.='"'.ucwords(strtolower($value)).'",';
+            }else{
+                $valores.='"'.$value.'",';
+            }
+        }
 		$columnas = substr($columnas, 0, -1);
 		$valores = substr($valores, 0, -1);
 
-		$stmt = "INSERT INTO " . $table . " (" . $columnas . ") VALUES(" . $valores . ") " . $where . ";";
+		$stmt = "INSERT INTO `".$table."`(".$columnas.") VALUES(".$valores.") ".$where.";";
 
 		//$result = $this->link->query($stmt) or die($this->link->error.__LINE__);
 		$result = $this->link->query($stmt) or die($this->link->error);
